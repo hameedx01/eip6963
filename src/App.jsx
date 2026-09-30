@@ -1,63 +1,28 @@
-import { useEffect, useState } from "react";
-import Eip6963 from "./Eip6963";
+import ConnectButton from "./components/ConnectButton.jsx";
+import RefreshBalanceButton from "./components/RefreshBalanceButton.jsx";
+import SupportedChains from "./components/SupportedChains.jsx";
+import { useWalletConnection } from "./hooks/useWalletConnection.jsx";
 
 function App() {
-  const [account, setAccount] = useState("");
-  const [chainId, setChainId] = useState(0);
-
-  useEffect(() => {
-    const provider = window.ethereum;
-    if (!provider) return;
-
-    let active = true;
-
-    const accountsChanged = (accounts) => {
-      if (active) setAccount(accounts[0] || "");
-    };
-    const chainChanged = (id) => {
-      if (active) setChainId(Number(id));
-    };
-    const disconnected = () => {
-      if (!active) return;
-      setAccount("");
-      setChainId(0);
-    };
-
-    async function setUp() {
-      try {
-        const accounts = await provider.request({
-          method: "eth_requestAccounts",
-        });
-        const id = await provider.request({ method: "eth_chainId" });
-        if (!active) return;
-
-        accountsChanged(accounts);
-        chainChanged(id);
-        provider.on("accountsChanged", accountsChanged);
-        provider.on("chainChanged", chainChanged);
-        provider.on("disconnect", disconnected);
-      } catch (error) {
-        if (active) console.error("Unable to initialize the wallet:", error);
-      }
-    }
-
-    setUp();
-
-    return () => {
-      active = false;
-      provider.removeListener("accountsChanged", accountsChanged);
-      provider.removeListener("chainChanged", chainChanged);
-      provider.removeListener("disconnect", disconnected);
-    };
-  }, []);
+  const { account, chainId, balance, provider, getBalance, connectWallet, disconnectWallet } = useWalletConnection();
 
   return (
     <div>
-      <Eip6963 />
-
       <h1 style={{ margin: "20px" }}>EIP 1193</h1>
-      <p>Account: {account}</p>
-      <p>chainid: {chainId}</p>
+      {account && <p>Account: {account}</p>}
+      {chainId !== null && <p>Chain ID: {chainId}</p>}
+      {account && (
+        <p aria-live="polite">
+          Balance (native token): {balance ?? "Unavailable"}
+        </p>
+      )}
+      <ConnectButton
+        account={account}
+        connectWallet={connectWallet}
+        disconnectWallet={disconnectWallet}
+      />
+      <RefreshBalanceButton account={account} getBalance={getBalance} />
+      <SupportedChains account={account} chainId={chainId} provider={provider} />
     </div>
   );
 }

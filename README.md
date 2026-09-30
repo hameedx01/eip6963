@@ -1,5 +1,18 @@
 # React + Vite
 
+## Local development
+
+Use the Node.js version in `.nvmrc` before running the app:
+
+```sh
+nvm use
+npm install
+npm run dev
+```
+
+If `nvm` is not loaded in your terminal, run `source ~/.nvm/nvm.sh` first.
+Run `npm run lint` and `npm run build` to check the project.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

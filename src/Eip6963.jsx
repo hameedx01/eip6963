@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-// Add or remove networks here to change which chains the app supports.
-const SUPPORTED_CHAINS = [
-  { id: 1, name: "Ethereum Mainnet" },
-  { id: 11155111, name: "Sepolia" },
-];
+import { SUPPORTED_CHAINS } from "./constants/chains.js";
 
 const Eip6963 = () => {
   const [providers, setProviders] = useState([]);
